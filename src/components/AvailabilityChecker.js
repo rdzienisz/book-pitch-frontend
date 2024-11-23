@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// src/components/AvailabilityChecker.js
+
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Button,
@@ -14,21 +16,22 @@ import {
 } from '@mui/material';
 import { checkAvailability } from '../services/api';
 
-const AvailabilityChecker = ({ pitchId }) => {
-    const [date, setDate] = useState('');
+const AvailabilityChecker = ({ pitchId, defaultDate }) => {
+    const [date, setDate] = useState(defaultDate || '');
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleCheck = () => {
-        if (!date) {
-            setError('Please select a date');
-            return;
+    useEffect(() => {
+        if (date) {
+            handleCheck(date);
         }
+    }, [date]);
 
+    const handleCheck = (selectedDate) => {
         setLoading(true);
         setError('');
-        checkAvailability(pitchId, date)
+        checkAvailability(pitchId, selectedDate)
             .then((response) => setSlots(response.data))
             .catch((err) => {
                 console.error(err);
@@ -54,7 +57,7 @@ const AvailabilityChecker = ({ pitchId }) => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={handleCheck}
+                onClick={() => handleCheck(date)}
                 fullWidth
                 style={{ marginBottom: '20px' }}
             >

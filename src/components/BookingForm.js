@@ -1,21 +1,41 @@
-import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
-import { createBooking } from '../services/api';
+// src/components/BookingForm.js
 
-const   BookingForm = ({ pitchId }) => {
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { createBooking, getPitches } from '../services/api';
+import AvailableSlotsTable from './AvailableSlotsTable';
+
+const BookingForm = ({ pitchId: initialPitchId }) => {
     const [email, setEmail] = useState('');
     const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
-    const [duration, setDuration] = useState(1);
+    const [selectedSlots, setSelectedSlots] = useState([]);
     const [error, setError] = useState('');
+    const [pitchId, setPitchId] = useState(initialPitchId || '');
+    const [pitches, setPitches] = useState([]);
+
+    useEffect(() => {
+        if (!initialPitchId) {
+            getPitches().then((response) => setPitches(response.data));
+        }
+    }, [initialPitchId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const startTime = `${date}T${time}`;
-        const durationHours = parseInt(duration, 10);
+        if (!pitchId) {
+            setError('Please select a pitch');
+            return;
+        }
+        if (selectedSlots.length === 0) {
+            setError('Please select at least one start time');
+            return;
+        }
 
         try {
-            await createBooking(pitchId, email, startTime, durationHours);
+            for (let startTime of selectedSlots) {
+                // Ensure startTime is formatted with the full date and time
+                const formattedStartTime = `${date}T${startTime}`;
+                await createBooking(pitchId, email, formattedStartTime, 1); // Assuming each slot is 1 hour
+            }
             alert('Booking successful!');
         } catch (err) {
             console.error('Error creating booking:', err);
@@ -26,6 +46,24 @@ const   BookingForm = ({ pitchId }) => {
     return (
         <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
             <h3>Create Booking</h3>
+
+            {!initialPitchId && (
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Select Pitch</InputLabel>
+                    <Select
+                        value={pitchId}
+                        onChange={(e) => setPitchId(e.target.value)}
+                        required
+                    >
+                        {pitches.map((pitch) => (
+                            <MenuItem key={pitch.id} value={pitch.id}>
+                                {pitch.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
+
             <TextField
                 label="Email"
                 type="email"
@@ -45,25 +83,20 @@ const   BookingForm = ({ pitchId }) => {
                 margin="normal"
                 InputLabelProps={{ shrink: true }}
             />
-            <TextField
-                label="Time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-                fullWidth
-                margin="normal"
-                InputLabelProps={{ shrink: true }}
+
+            <AvailableSlotsTable
+                pitchId={pitchId}
+                date={date}
+                onSelectSlots={setSelectedSlots}
             />
+
             <TextField
                 label="Duration (hours)"
                 type="number"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                required
+                value={selectedSlots.length} // Set duration based on selected slots
+                readOnly
                 fullWidth
                 margin="normal"
-                InputProps={{ inputProps: { min: 1, max: 14 } }}
             />
             <Button
                 type="submit"
