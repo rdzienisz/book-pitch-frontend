@@ -1,31 +1,31 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Button, Typography } from '@mui/material';
-import { useAuth } from '../context/AuthContext'; // Import the useAuth hook
+import { useAuth } from '../context/AuthContext';
 
 const Navigation = () => {
-    const { isAdmin, logout } = useAuth(); // Access isAdmin and logout from context
+    const { isAdmin, logout } = useAuth();
     const [logoutMessage, setLogoutMessage] = useState('');
 
     const handleLogout = () => {
         logout();
         setLogoutMessage('Logout successful!');
-        setTimeout(() => setLogoutMessage(''), 3000); // Clear message after 3 seconds
+        setTimeout(() => setLogoutMessage(''), 3000);
     };
 
     return (
         <div>
             <AppBar position="static">
                 <Toolbar>
-                    <Button color="inherit" component={Link} to="/">Home</Button>
-                    <Button color="inherit" component={Link} to="/pitches">Pitches</Button>
-                    <Button color="inherit" component={Link} to="/contact">Contact</Button>
-                    <Button color="inherit" component={Link} to="/book">Book</Button>
+                    <Button id="home-button" color="inherit" component={Link} to="/">Home</Button>
+                    <Button id="pitches-button" color="inherit" component={Link} to="/pitches">Pitches</Button>
+                    <Button id="contact-button" color="inherit" component={Link} to="/contact">Contact</Button>
+                    <Button id="book-button" color="inherit" component={Link} to="/book">Book</Button>
                     {isAdmin && (
                         <>
-                            <Button color="inherit" component={Link} to="/bookings">Booking List</Button>
-                            <div style={{ flexGrow: 1 }} /> {/* This pushes the next button to the right */}
-                            <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                            <Button id="booking-list-button" color="inherit" component={Link} to="/bookings">Booking List</Button>
+                            <div style={{ flexGrow: 1 }} />
+                            <Button id="logout-button" color="inherit" onClick={handleLogout}>Logout</Button>
                         </>
                     )}
                 </Toolbar>
