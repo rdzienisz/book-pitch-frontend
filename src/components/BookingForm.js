@@ -8,6 +8,7 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
     const [date, setDate] = useState('');
     const [selectedSlots, setSelectedSlots] = useState([]);
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [pitchId, setPitchId] = useState(initialPitchId || '');
     const [pitches, setPitches] = useState([]);
 
@@ -19,6 +20,9 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccessMessage('');
+
         if (!pitchId) {
             setError('Please select a pitch');
             return;
@@ -33,7 +37,7 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
                 const formattedStartTime = `${date}T${startTime}`;
                 await createBooking(pitchId, email, formattedStartTime, 1);
             }
-            alert('Booking successful!');
+            setSuccessMessage('Booking successful!');
         } catch (err) {
             console.error('Error creating booking:', err);
             setError(err.response?.data || 'An unexpected error occurred');
@@ -109,7 +113,8 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
             >
                 Book
             </Button>
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+            {error && <div id="error-message" style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
+            {successMessage && <div id="success-message" style={{ color: 'green', marginTop: '10px' }}>{successMessage}</div>}
         </form>
     );
 };
