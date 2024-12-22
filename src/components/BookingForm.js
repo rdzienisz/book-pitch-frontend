@@ -1,5 +1,3 @@
-// src/components/BookingForm.js
-
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import { createBooking, getPitches } from '../services/api';
@@ -32,9 +30,8 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
 
         try {
             for (let startTime of selectedSlots) {
-                // Ensure startTime is formatted with the full date and time
                 const formattedStartTime = `${date}T${startTime}`;
-                await createBooking(pitchId, email, formattedStartTime, 1); // Assuming each slot is 1 hour
+                await createBooking(pitchId, email, formattedStartTime, 1);
             }
             alert('Booking successful!');
         } catch (err) {
@@ -51,6 +48,7 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Select Pitch</InputLabel>
                     <Select
+                        id="pitch-select"
                         value={pitchId}
                         onChange={(e) => setPitchId(e.target.value)}
                         required
@@ -65,6 +63,7 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
             )}
 
             <TextField
+                id="email-input"
                 label="Email"
                 type="email"
                 value={email}
@@ -74,6 +73,7 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
                 margin="normal"
             />
             <TextField
+                id="date-input"
                 label="Date"
                 type="date"
                 value={date}
@@ -91,14 +91,16 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
             />
 
             <TextField
+                id="duration-input"
                 label="Duration (hours)"
                 type="number"
-                value={selectedSlots.length} // Set duration based on selected slots
+                value={selectedSlots.length}
                 readOnly
                 fullWidth
                 margin="normal"
             />
             <Button
+                id="create-booking-button"
                 type="submit"
                 variant="contained"
                 color="primary"
