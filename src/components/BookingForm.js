@@ -27,13 +27,21 @@ const BookingForm = ({ pitchId: initialPitchId }) => {
             setError('Please select at least one start time');
             return;
         }
-
         try {
             for (let startTime of selectedSlots) {
                 const formattedStartTime = `${date}T${startTime}`;
                 await createBooking(pitchId, email, formattedStartTime, 1);
             }
             alert('Booking successful!');
+            // Clear all fields
+            setEmail('');
+            setDate('');
+            setSelectedSlots([]);
+            setPitchId(initialPitchId || '');
+            // Refresh the page after 3 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         } catch (err) {
             console.error('Error creating booking:', err);
             setError(err.response?.data || 'An unexpected error occurred');
